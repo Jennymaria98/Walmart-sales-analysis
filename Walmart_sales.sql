@@ -105,6 +105,69 @@ from sales group by product_line order by revenue desc limit 1;
 select city ,SUM(total) AS revenue
 from sales group by city order by revenue desc limit 1;
 
+-- 8.Which product line incurred the highest VAT?
+select product_line , SUM(vat) AS Highest_vat
+from sales group by product_line order by Highest_vat desc limit 1;
+
+-- 9.Retrieve each product line and add a column product_category, indicating 'Good' or 'Bad,'whether its sales are above the average.
+
+alter table sales add column product_category varchar(20);
+
+UPDATE sales 
+JOIN (
+    SELECT AVG(total) AS avg_total FROM sales
+) AS subquery
+SET sales.product_category = 
+  CASE 
+    WHEN sales.total >= subquery.avg_total THEN 'Good'
+    ELSE 'Bad'
+  END;
+  
+-- Sales Analysis
+
+-- 1.Number of sales made in each time of the day per weekday
+select day_name , Time_of_day , count(invoice_id) AS total_sales
+from sales group by day_name ,Time_of_day Having day_name NOT IN ('sunday','Saturday');
+
+-- 2.Identify the customer type that generates the highest revenue.
+SELECT customer_type, SUM(total) AS total_sales
+FROM sales GROUP BY customer_type ORDER BY total_sales DESC LIMIT 1;
+
+-- 4.Which customer type pays the most in VAT?
+SELECT customer_type, SUM(VAT) AS total_VAT
+FROM sales GROUP BY customer_type ORDER BY total_VAT DESC LIMIT 1;
+
+-- Customer Analysis
+
+-- 1.How many unique customer types does the data have?
+SELECT COUNT(DISTINCT customer_type) FROM sales;
+
+-- 2.How many unique payment methods does the data have?
+SELECT COUNT(DISTINCT payment) FROM sales;
+
+-- 3.Which is the most common customer type?
+SELECT customer_type, COUNT(customer_type) AS common_customer
+FROM sales GROUP BY customer_type ORDER BY common_customer DESC LIMIT 1;
+
+-- 4.Which customer type buys the most?
+SELECT customer_type, SUM(total) as total_sales
+FROM sales GROUP BY customer_type ORDER BY total_sales LIMIT 1;
+
+SELECT customer_type, COUNT(*) AS most_buyer
+FROM sales GROUP BY customer_type ORDER BY most_buyer DESC LIMIT 1;
+
+-- 5.What is the gender of most of the customers?
+SELECT gender, COUNT(*) AS all_genders 
+FROM sales GROUP BY gender ORDER BY all_genders DESC LIMIT 1;
+
+-- 6.What is the gender distribution per branch?
+SELECT branch, gender, COUNT(gender) AS gender_distribution
+FROM sales GROUP BY branch, gender ORDER BY branch;
+
+		
+
+
+
 
 
 
